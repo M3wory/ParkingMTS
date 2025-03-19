@@ -1,0 +1,3198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkingMTS - Умный паркинг в вашем городе</title>
+    <style>
+        /* Основные стили */
+        :root {
+            --primary-color: #e60000;
+            --primary-light: #ff3333;
+            --primary-dark: #b30000;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #888888;
+            --black: #333333;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --info: #2196F3;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--white);
+            color: var(--black);
+            font-size: 16px;
+            line-height: 1.5;
+            max-width: 450px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            padding: 20px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+        
+        h1, h2, h3 {
+            color: var(--primary-color);
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            margin-bottom: 15px;
+        }
+        
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .animated {
+            animation-duration: 0.5s;
+            animation-fill-mode: both;
+        }
+        
+        .fadeIn {
+            animation-name: fadeIn;
+        }
+        
+        .slideUp {
+            animation-name: slideUp;
+        }
+        
+        .pulse {
+            animation-name: pulse;
+            animation-duration: 1s;
+            animation-iteration-count: infinite;
+        }
+        
+        /* Кнопки */
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn::after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform .5s, opacity 1s;
+        }
+        
+        .btn:active::after {
+            transform: scale(0, 0);
+            opacity: .3;
+            transition: 0s;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+            color: var(--white);
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        
+        .btn-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-icon i {
+            margin-right: 8px;
+        }
+        
+        /* Формы */
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--black);
+            transition: var(--transition);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(230, 0, 0, 0.1);
+        }
+        
+        input:focus + label.floating-label,
+        input:not(:placeholder-shown) + label.floating-label {
+            transform: translateY(-25px) scale(0.8);
+            color: var(--primary-color);
+        }
+        
+        .floating-label {
+            position: absolute;
+            pointer-events: none;
+            left: 12px;
+            top: 12px;
+            transition: var(--transition);
+            background-color: var(--white);
+            padding: 0 5px;
+        }
+        
+        /* Header */
+        .header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            height: 60px;
+        }
+        
+        .header h1 {
+            color: var(--white);
+            margin: 0;
+            font-size: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            font-size: 24px;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .logo-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        .header-action {
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .header-action:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Табы навигации */
+        .nav-tabs {
+            display: flex;
+            background-color: var(--white);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 450px;
+            margin: 0 auto;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--dark-gray);
+        }
+        
+        .nav-tab.active {
+            color: var(--primary-color);
+        }
+        
+        .nav-tab:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .nav-tab i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .nav-tab-text {
+            font-size: 12px;
+        }
+        
+        /* Screens */
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        /* Login Screen */
+        .login-screen {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .app-logo {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: pulse 2s infinite;
+        }
+        
+        .app-logo h1 {
+            font-size: 28px;
+            margin-top: 10px;
+        }
+        
+        .login-form {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            animation: slideUp 0.5s ease;
+        }
+        
+        /* Profile Screen */
+        .profile-header {
+            margin-bottom: 30px;
+        }
+        
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--medium-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-pic:hover {
+            box-shadow: var(--shadow);
+        }
+        
+        .profile-pic i {
+            font-size: 40px;
+            color: var(--dark-gray);
+        }
+        
+        .profile-pic-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .profile-pic:hover .profile-pic-overlay {
+            opacity: 1;
+        }
+        
+        .vehicle-list {
+            margin-top: 20px;
+        }
+        
+        .vehicle-item {
+            background-color: var(--light-gray);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: fadeIn 0.3s ease;
+            transition: var(--transition);
+        }
+        
+        .vehicle-item:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+        
+        .add-vehicle {
+            display: flex;
+            align-items: center;
+            color: var(--primary-color);
+            margin-top: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .add-vehicle:hover {
+            transform: translateX(5px);
+        }
+        
+        .add-vehicle i {
+            margin-right: 8px;
+        }
+        
+        .settings-section {
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .settings-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid var(--medium-gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .settings-item:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .settings-icon {
+            width: 40px;
+            color: var(--primary-color);
+        }
+        
+        .settings-text {
+            flex: 1;
+        }
+        
+        .settings-arrow {
+            color: var(--dark-gray);
+        }
+        
+        /* Map Screen */
+        .map-container {
+            height: 50vh;
+            background-color: var(--light-gray);
+            margin-bottom: 20px;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            touch-action: pan-x pan-y;
+        }
+        
+        .city-map {
+            position: relative;
+            width: 1000px;
+            height: 1000px;
+            background-color: #f0f0f0;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            transform-origin: center center;
+        }
+        
+        .road {
+            position: absolute;
+            background-color: #ccc;
+        }
+        
+        .road-h {
+            height: 20px;
+        }
+        
+        .road-v {
+            width: 20px;
+        }
+        
+        .building {
+            position: absolute;
+            background-color: #ddd;
+            border-radius: 4px;
+        }
+        
+        .park {
+            position: absolute;
+            background-color: #a8d5ba;
+            border-radius: 8px;
+        }
+        
+        .water {
+            position: absolute;
+            background-color: #b3d9ff;
+            border-radius: 50%;
+        }
+        
+        .parking-marker {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 5;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+        
+        .parking-marker:hover {
+            transform: scale(1.2);
+            z-index: 6;
+        }
+        
+        .user-marker {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #2196F3;
+            border: 3px solid white;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .map-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+        }
+        
+        .map-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .map-control-btn {
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .map-control-btn:hover {
+            background-color: var(--light-gray);
+            transform: scale(1.1);
+        }
+        
+        .parking-list {
+            margin-top: 20px;
+        }
+        
+        .parking-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid var(--medium-gray);
+            cursor: pointer;
+            transition: var(--transition);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .parking-item:hover {
+            background-color: var(--light-gray);
+            transform: translateX(5px);
+        }
+        
+        .parking-status {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 15px;
+            transition: var(--transition);
+        }
+        
+        .status-empty {
+            background-color: var(--primary-color);
+        }
+        
+        .status-limited {
+            background-color: var(--warning);
+        }
+        
+        .status-available {
+            background-color: var(--success);
+        }
+        
+        .parking-info {
+            flex: 1;
+        }
+        
+        .parking-name {
+            font-weight: bold;
+        }
+        
+        .parking-address {
+            font-size: 14px;
+            color: var(--dark-gray);
+        }
+        
+        .parking-distance {
+            color: var(--dark-gray);
+            font-size: 14px;
+        }
+        
+        .filter-container {
+            margin: 20px 0;
+        }
+        
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .filter-chip {
+            background-color: var(--light-gray);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .filter-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .filter-chip.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        
+        /* Parking Detail Screen */
+        .parking-detail-header {
+            margin-bottom: 20px;
+        }
+        
+        .parking-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .parking-feature {
+            background-color: var(--light-gray);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: var(--black);
+        }
+        
+        .parking-map {
+            height: 30vh;
+            background-color: var(--light-gray);
+            margin-bottom: 20px;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        .floor-selector {
+            display: flex;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        
+        .floor-item {
+            padding: 8px 15px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 5px;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        
+        .floor-item.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+        }
+        
+        .parking-spots-container {
+            position: relative;
+            overflow: auto;
+            margin: 20px 0;
+        }
+        
+        .parking-layout {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            width: fit-content;
+            margin: 0 auto;
+        }
+        
+        .parking-spot {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .parking-spot:hover {
+            transform: scale(1.1);
+            z-index: 5;
+        }
+        
+        .spot-available {
+            background-color: var(--success);
+            color: var(--white);
+        }
+        
+        .spot-occupied {
+            background-color: var(--medium-gray);
+            color: var(--dark-gray);
+        }
+        
+        .spot-selected {
+            background-color: var(--primary-color);
+            color: var(--white);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .booking-details {
+            background-color: var(--light-gray);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .time-selector {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .time-control {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .time-control:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.1);
+        }
+        
+        .time-value {
+            flex: 1;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .price-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        
+        .date-time-selector {
+            margin: 15px 0;
+        }
+        
+        /* Bookings Screen */
+        .booking-card {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            position: relative;
+            transition: var(--transition);
+            animation: slideUp 0.3s ease;
+        }
+        
+        .booking-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .booking-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-active {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+        
+        .status-completed {
+            background-color: rgba(33, 150, 243, 0.2);
+            color: var(--info);
+        }
+        
+        .booking-info-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        
+        .booking-info-label {
+            width: 120px;
+            color: var(--dark-gray);
+        }
+        
+        .booking-info-value {
+            font-weight: bold;
+        }
+        
+        .booking-actions {
+            display: flex;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        
+        /* Payment Screen */
+        .payment-methods {
+            margin-top: 20px;
+        }
+        
+        .payment-method {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .payment-method:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .payment-method.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(230, 0, 0, 0.05);
+        }
+        
+        .payment-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+        
+        .payment-name {
+            flex: 1;
+        }
+        
+        .save-payment {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .save-payment input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        /* Buttons fixed to bottom */
+        .bottom-actions {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--white);
+            padding: 15px 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+        }
+        
+        /* Loading animation */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading.active {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--medium-gray);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: rotate 1s linear infinite;
+        }
+        
+        /* Success Screen */
+        .success-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 100vh;
+            padding: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .success-icon {
+            font-size: 80px;
+            color: var(--success);
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background-color: var(--white);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            min-width: 280px;
+            max-width: 350px;
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(-50%) translateY(50px);
+        }
+        
+        .notification-icon {
+            margin-right: 15px;
+            font-size: 20px;
+        }
+        
+        .notification-success .notification-icon {
+            color: var(--success);
+        }
+        
+        .notification-error .notification-icon {
+            color: var(--primary-color);
+        }
+        
+        .notification-info .notification-icon {
+            color: var(--info);
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-close {
+            margin-left: 15px;
+            cursor: pointer;
+            color: var(--dark-gray);
+        }
+        
+        /* Backdrop */
+        .backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 900;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .backdrop.active {
+            display: block;
+        }
+        
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            z-index: 1000;
+            max-width: 90%;
+            width: 350px;
+            display: none;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .modal.active {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .modal-close {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--dark-gray);
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--medium-gray);
+            transition: var(--transition);
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--white);
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Media query для мелких экранов */
+        @media (max-width: 360px) {
+            .parking-spots {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .filter-chip {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            
+            .parking-spot {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Экран входа -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-screen">
+            <div class="app-logo">
+                <i class="fas fa-parking" style="font-size: 60px; color: var(--primary-color);"></i>
+                <h1>ParkingMTS</h1>
+                <p>Умный паркинг в вашем городе</p>
+            </div>
+            
+            <div class="login-form">
+                <h2>Вход в приложение</h2>
+                <div class="form-group">
+                    <label for="phone">Номер телефона</label>
+                    <input type="tel" id="phone" placeholder="+375 29 123 45 67">
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" placeholder="Введите пароль">
+                </div>
+                <button class="btn" id="loginBtn">Войти</button>
+                <button class="btn btn-outline" id="registerBtn">Зарегистрироваться</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Экран профиля при первом входе -->
+    <div id="profileScreen" class="screen">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-parking logo-icon"></i>
+                <h1>ParkingMTS</h1>
+            </div>
+            <i class="fas fa-bars header-action" id="menuBtn"></i>
+        </div>
+        
+        <div class="container">
+            <div class="profile-header">
+                <h2>Заполните профиль</h2>
+                <p>Для продолжения работы необходимо указать персональную информацию</p>
+            </div>
+            
+            <div class="profile-pic">
+                <i class="fas fa-user"></i>
+                <div class="profile-pic-overlay">
+                    <i class="fas fa-camera" style="color: white; font-size: 24px;"></i>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="firstName">Имя</label>
+                <input type="text" id="firstName" placeholder="Введите имя">
+            </div>
+            
+            <div class="form-group">
+                <label for="lastName">Фамилия</label>
+                <input type="text" id="lastName" placeholder="Введите фамилию">
+            </div>
+            
+            <div class="vehicle-list">
+                <h3>Транспортные средства</h3>
+                <p>Добавьте хотя бы одно ТС</p>
+                
+                <div class="vehicle-item">
+                    <div class="form-group">
+                        <label for="vehicleNumber">Регистрационный номер</label>
+                        <input type="text" id="vehicleNumber" placeholder="Например, 1234 AB-7">
+                    </div>
+                </div>
+                
+                <div class="add-vehicle">
+                    <i class="fas fa-plus-circle"></i> Добавить еще ТС
+                </div>
+            </div>
+            
+            <div class="bottom-actions">
+                <button class="btn" id="saveProfileBtn">Сохранить и продолжить</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Экран настроек профиля -->
+    <div id="settingsScreen" class="screen">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-arrow-left logo-icon" id="backFromSettingsBtn"></i>
+                <h1>Настройки профиля</h1>
+            </div>
+            <i class="fas fa-check header-action" id="saveSettingsBtn"></i>
+        </div>
+        
+        <div class="container">
+            <div class="profile-pic">
+                <i class="fas fa-user"></i>
+                <div class="profile-pic-overlay">
+                    <i class="fas fa-camera" style="color: white; font-size: 24px;"></i>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="form-group">
+                    <label for="settingsFirstName">Имя</label>
+                    <input type="text" id="settingsFirstName" value="Иван">
+                </div>
+                
+                <div class="form-group">
+                    <label for="settingsLastName">Фамилия</label>
+                    <input type="text" id="settingsLastName" value="Петров">
+                </div>
+                
+                <div class="form-group">
+                    <label for="settingsPhone">Номер телефона</label>
+                    <input type="tel" id="settingsPhone" value="+375 29 123 45 67">
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Транспортные средства</h3>
+                
+                <div class="vehicle-item">
+                    <div class="form-group">
+                        <label>Регистрационный номер</label>
+                        <div style="display: flex;">
+                            <input type="text" value="1234 AB-7" style="flex: 1;">
+                            <button class="btn-small" style="margin: 0 0 0 10px; width: auto; background-color: var(--dark-gray);">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+
+                
+                <div class="add-vehicle">
+                    <i class="fas fa-plus-circle"></i> Добавить еще ТС
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Безопасность</h3>
+                
+                <div class="form-group">
+                    <label for="currentPassword">Текущий пароль</label>
+                    <input type="password" id="currentPassword" placeholder="Введите текущий пароль">
+                </div>
+                
+                <div class="form-group">
+                    <label for="newPassword">Новый пароль</label>
+                    <input type="password" id="newPassword" placeholder="Введите новый пароль">
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Подтверждение пароля</label>
+                    <input type="password" id="confirmPassword" placeholder="Подтвердите новый пароль">
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Уведомления</h3>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>Push-уведомления</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>SMS-уведомления</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>Email-уведомления</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <button class="btn btn-outline" style="background-color: transparent;">Выйти из аккаунта</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Экран карты -->
+    <div id="mapScreen" class="screen">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-parking logo-icon"></i>
+                <h1>ParkingMTS</h1>
+            </div>
+            <i class="fas fa-user header-action" id="profileBtn"></i>
+        </div>
+        
+        <div class="container">
+            <div class="map-container">
+                <div id="cityMap" class="city-map" style="transform: translate(-300px, -300px);">
+                    <!-- Дороги -->
+                    <div class="road road-h" style="top: 200px; left: 0; width: 1000px;"></div>
+                    <div class="road road-h" style="top: 400px; left: 0; width: 1000px;"></div>
+                    <div class="road road-h" style="top: 600px; left: 0; width: 1000px;"></div>
+                    <div class="road road-h" style="top: 800px; left: 0; width: 1000px;"></div>
+                    
+                    <div class="road road-v" style="top: 0; left: 200px; height: 1000px;"></div>
+                    <div class="road road-v" style="top: 0; left: 400px; height: 1000px;"></div>
+                    <div class="road road-v" style="top: 0; left: 600px; height: 1000px;"></div>
+                    <div class="road road-v" style="top: 0; left: 800px; height: 1000px;"></div>
+                    
+                    <!-- Здания -->
+                    <div class="building" style="top: 50px; left: 50px; width: 120px; height: 120px;"></div>
+                    <div class="building" style="top: 50px; left: 250px; width: 100px; height: 80px;"></div>
+                    <div class="building" style="top: 50px; left: 450px; width: 130px; height: 100px;"></div>
+                    <div class="building" style="top: 50px; left: 650px; width: 100px; height: 120px;"></div>
+                    <div class="building" style="top: 50px; left: 850px; width: 80px; height: 100px;"></div>
+                    
+                    <div class="building" style="top: 250px; left: 50px; width: 100px; height: 100px;"></div>
+                    <div class="building" style="top: 250px; left: 250px; width: 120px; height: 90px;"></div>
+                    <div class="building" style="top: 250px; left: 450px; width: 100px; height: 120px;"></div>
+                    <div class="building" style="top: 250px; left: 650px; width: 110px; height: 100px;"></div>
+                    <div class="building" style="top: 250px; left: 850px; width: 100px; height: 90px;"></div>
+                    
+                    <div class="building" style="top: 450px; left: 50px; width: 110px; height: 90px;"></div>
+                    <div class="building" style="top: 450px; left: 250px; width: 90px; height: 100px;"></div>
+                    <div class="building" style="top: 450px; left: 450px; width: 120px; height: 120px;"></div>
+                    <div class="building" style="top: 450px; left: 650px; width: 100px; height: 110px;"></div>
+                    <div class="building" style="top: 450px; left: 850px; width: 120px; height: 100px;"></div>
+                    
+                    <div class="building" style="top: 650px; left: 50px; width: 100px; height: 120px;"></div>
+                    <div class="building" style="top: 650px; left: 250px; width: 110px; height: 100px;"></div>
+                    <div class="building" style="top: 650px; left: 450px; width: 90px; height: 100px;"></div>
+                    <div class="building" style="top: 650px; left: 650px; width: 120px; height: 90px;"></div>
+                    <div class="building" style="top: 650px; left: 850px; width: 100px; height: 110px;"></div>
+                    
+                    <div class="building" style="top: 850px; left: 50px; width: 100px; height: 100px;"></div>
+                    <div class="building" style="top: 850px; left: 250px; width: 100px; height: 100px;"></div>
+                    <div class="building" style="top: 850px; left: 450px; width: 100px; height: 100px;"></div>
+                    <div class="building" style="top: 850px; left: 650px; width: 100px; height: 100px;"></div>
+                    <div class="building" style="top: 850px; left: 850px; width: 100px; height: 100px;"></div>
+                    
+                    <!-- Парки и водоемы -->
+                    <div class="park" style="top: 100px; left: 320px; width: 60px; height: 60px;"></div>
+                    <div class="park" style="top: 520px; left: 720px; width: 80px; height: 40px;"></div>
+                    <div class="water" style="top: 700px; left: 320px; width: 150px; height: 80px;"></div>
+                    
+                    <!-- Маркеры парковок -->
+                    <div class="parking-marker" style="top: 170px; left: 110px; background-color: #4CAF50;" data-id="1">P1</div>
+                    <div class="parking-marker" style="top: 270px; left: 510px; background-color: #FFC107;" data-id="2">P2</div>
+                    <div class="parking-marker" style="top: 370px; left: 310px; background-color: #e60000;" data-id="3">P3</div>
+                    <div class="parking-marker" style="top: 470px; left: 710px; background-color: #4CAF50;" data-id="4">P4</div>
+                    <div class="parking-marker" style="top: 570px; left: 510px; background-color: #FFC107;" data-id="5">P5</div>
+                    <div class="parking-marker" style="top: 670px; left: 110px; background-color: #4CAF50;" data-id="6">P6</div>
+                    <div class="parking-marker" style="top: 770px; left: 710px; background-color: #e60000;" data-id="7">P7</div>
+                    <div class="parking-marker" style="top: 170px; left: 710px; background-color: #4CAF50;" data-id="8">P8</div>
+                    <div class="parking-marker" style="top: 870px; left: 310px; background-color: #4CAF50;" data-id="9">P9</div>
+                    <div class="parking-marker" style="top: 570px; left: 910px; background-color: #FFC107;" data-id="10">P10</div>
+                    
+                    <!-- Маркер пользователя -->
+                    <div class="user-marker" style="top: 500px; left: 500px;"></div>
+                </div>
+                
+                <div class="map-overlay">
+                    <div style="background-color: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; cursor: pointer;">
+                        <i class="fas fa-location-arrow" style="color: var(--primary-color); margin-right: 8px;"></i> Найти рядом
+                    </div>
+                </div>
+                
+                <div class="map-controls">
+                    <div class="map-control-btn" id="zoomInBtn">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="map-control-btn" id="zoomOutBtn">
+                        <i class="fas fa-minus"></i>
+                    </div>
+                    <div class="map-control-btn" id="centerMapBtn">
+                        <i class="fas fa-crosshairs"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="filter-container">
+                <h3>Фильтры парковок</h3>
+                <div class="filter-chips">
+                    <div class="filter-chip" data-filter="covered">Крытая</div>
+                    <div class="filter-chip" data-filter="uncovered">Некрытая</div>
+                    <div class="filter-chip" data-filter="car">Легковые</div>
+                    <div class="filter-chip" data-filter="truck">Грузовые</div>
+                    <div class="filter-chip" data-filter="security">Охраняемая</div>
+                    <div class="filter-chip" data-filter="24h">24/7</div>
+                    <div class="filter-chip" data-filter="ev">Зарядка EV</div>
+                    <div class="filter-chip" data-filter="disabled">Для инвалидов</div>
+                    <div class="filter-chip" data-filter="long">Длительная</div>
+                    <div class="filter-chip" data-filter="free">Бесплатная</div>
+                </div>
+            </div>
+            
+            <div class="parking-list">
+                <h3>Ближайшие парковки</h3>
+                
+                <div class="parking-item" data-id="1" data-filters="covered,car,security,24h,ev">
+                    <div class="parking-status status-available"></div>
+                    <div class="parking-info">
+                        <div class="parking-name">ТЦ Галерея</div>
+                        <div class="parking-address">ул. Ленина, 15</div>
+                        <div class="parking-details">Свободно: 45 из 60</div>
+                    </div>
+                    <div class="parking-distance">300м</div>
+                </div>
+                
+                <div class="parking-item" data-id="2" data-filters="covered,car,24h,disabled">
+                    <div class="parking-status status-limited"></div>
+                    <div class="parking-info">
+                        <div class="parking-name">Центральная площадь</div>
+                        <div class="parking-address">пл. Свободы, 2</div>
+                        <div class="parking-details">Свободно: 12 из 40</div>
+                    </div>
+                    <div class="parking-distance">500м</div>
+                </div>
+                
+                <div class="parking-item" data-id="3" data-filters="uncovered,car,truck,security">
+                    <div class="parking-status status-empty"></div>
+                    <div class="parking-info">
+                        <div class="parking-name">Бизнес-центр "Москва"</div>
+                        <div class="parking-address">пр. Независимости, 58</div>
+                        <div class="parking-details">Свободно: 0 из 80</div>
+                    </div>
+                    <div class="parking-distance">750м</div>
+                </div>
+                
+                <div class="parking-item" data-id="4" data-filters="covered,car,security,ev,disabled">
+                    <div class="parking-status status-available"></div>
+                    <div class="parking-info">
+                        <div class="parking-name">ТРЦ "Европа"</div>
+                        <div class="parking-address">ул. Сурганова, 57А</div>
+                        <div class="parking-details">Свободно: 35 из 50</div>
+                    </div>
+                    <div class="parking-distance">800м</div>
+                </div>
+                
+                <div class="parking-item" data-id="5" data-filters="uncovered,car,long,free">
+                    <div class="parking-status status-limited"></div>
+                    <div class="parking-info">
+                        <div class="parking-name">Городской парк</div>
+                        <div class="parking-address">ул. Парковая, 10</div>
+                        <div class="parking-details">Свободно: 18 из 45</div>
+                    </div>
+                    <div class="parking-distance">1.2км</div>
+                </div>
+                
+                <div class="parking-item" data-id="6" data-filters="covered,car,security,24h,ev,disabled">
+                    <div class="parking-status status-available"></div>
+                    <div class="parking-info">
+                        <div class="parking-name">Отель "Президент"</div>
+                        <div class="parking-address">ул. Кирова, 28</div>
+                        <div class="parking-details">Свободно: 25 из 30</div>
+                    </div>
+                    <div class="parking-distance">1.5км</div>
+                </div>
+                
+                <div class="parking-item" data-id="7" data-filters="uncovered,truck,long">
+                    <div class="parking-status status-empty"></div>
+                    <div class="parking-info">
+                        <div class="parking-name">Грузовой терминал</div>
+                        <div class="parking-address">ул. Промышленная, 8</div>
+                        <div class="parking-details">Свободно: 0 из 25</div>
+                    </div>
+                    <div class="parking-distance">2.3км</div>
+                </div>
+                
+                <div class="parking-item" data-id="8" data-filters="covered,car,24h,security">
+                    <div class="parking-status status-available"></div>
+                    <div class="parking-info">
+                        <div class="parking-name">Жилой комплекс "Маяк"</div>
+                        <div class="parking-address">пр. Победителей, 127</div>
+                        <div class="parking-details">Свободно: 30 из 40</div>
+                    </div>
+                    <div class="parking-distance">2.5км</div>
+                </div>
+                
+                <div class="parking-item" data-id="9" data-filters="uncovered,car,free">
+                    <div class="parking-status status-available"></div>
+                    <div class="parking-info">
+                        <div class="parking-name">Городская библиотека</div>
+                        <div class="parking-address">ул. Пушкина, 14</div>
+                        <div class="parking-details">Свободно: 15 из 20</div>
+                    </div>
+                    <div class="parking-distance">2.8км</div>
+                </div>
+                
+                <div class="parking-item" data-id="10" data-filters="covered,car,ev,24h">
+                    <div class="parking-status status-limited"></div>
+                    <div class="parking-info">
+                        <div class="parking-name">Торговый центр "Столица"</div>
+                        <div class="parking-address">пр. Независимости, 113</div>
+                        <div class="parking-details">Свободно: 22 из 70</div>
+                    </div>
+                    <div class="parking-distance">3.0км</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Панель навигации -->
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-screen="mapScreen">
+                <i class="fas fa-map-marked-alt"></i>
+                <div class="nav-tab-text">Карта</div>
+            </div>
+            <div class="nav-tab" data-screen="bookingsScreen">
+                <i class="fas fa-ticket-alt"></i>
+                <div class="nav-tab-text">Бронирования</div>
+            </div>
+            <div class="nav-tab" data-screen="profileSettingsScreen">
+                <i class="fas fa-user"></i>
+                <div class="nav-tab-text">Профиль</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Экран бронирований -->
+    <div id="bookingsScreen" class="screen">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-parking logo-icon"></i>
+                <h1>Мои бронирования</h1>
+            </div>
+            <i class="fas fa-search header-action"></i>
+        </div>
+        
+        <div class="container">
+            <div class="booking-card">
+                <div class="booking-status status-completed">Завершено</div>
+                <div class="booking-info-row">
+                    <div class="booking-info-label">Парковка:</div>
+                    <div class="booking-info-value">ТЦ Европа </div>
+                </div>
+                <div class="booking-info-row">
+                    <div class="booking-info-label">Место:</div>
+                    <div class="booking-info-value">12</div>
+                </div>
+                <div class="booking-info-row">
+                    <div class="booking-info-label">Автомобиль:</div>
+                    <div class="booking-info-value">1234 AB-7</div>
+                </div>
+                <div class="booking-info-row">
+                    <div class="booking-info-label">Дата и время:</div>
+                    <div class="booking-info-value">17.03.2025, 10:00 - 12:00</div>
+                </div>
+                <div class="booking-actions">
+                    <button class="btn btn-small" style="flex: 1;">Забронировать снова</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Панель навигации -->
+        <div class="nav-tabs">
+            <div class="nav-tab" data-screen="mapScreen">
+                <i class="fas fa-map-marked-alt"></i>
+                <div class="nav-tab-text">Карта</div>
+            </div>
+            <div class="nav-tab active" data-screen="bookingsScreen">
+                <i class="fas fa-ticket-alt"></i>
+                <div class="nav-tab-text">Бронирования</div>
+            </div>
+            <div class="nav-tab" data-screen="profileSettingsScreen">
+                <i class="fas fa-user"></i>
+                <div class="nav-tab-text">Профиль</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Экран профиля с настройками -->
+    <div id="profileSettingsScreen" class="screen">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-parking logo-icon"></i>
+                <h1>Профиль</h1>
+            </div>
+            <i class="fas fa-cog header-action" id="openSettingsBtn"></i>
+        </div>
+        
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div class="profile-pic">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h2 style="margin-top: 10px;">Иван Петров</h2>
+                <p>+375 29 123 45 67</p>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Транспортные средства</h3>
+                
+                <div class="vehicle-item">
+                    <div class="parking-name">1234 AB-7</div>
+                    <div style="color: var(--dark-gray);">Легковой автомобиль</div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Настройки приложения</h3>
+                
+                <div class="settings-item" id="personalInfoBtn">
+                    <div class="settings-icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <div class="settings-text">Личная информация</div>
+                    <div class="settings-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                
+                <div class="settings-item" id="vehiclesBtn">
+                    <div class="settings-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="settings-text">Транспортные средства</div>
+                    <div class="settings-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                
+                <div class="settings-item" id="securityBtn">
+                    <div class="settings-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="settings-text">Безопасность</div>
+                    <div class="settings-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                
+                <div class="settings-item" id="notificationsBtn">
+                    <div class="settings-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="settings-text">Уведомления</div>
+                    <div class="settings-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                
+                <div class="settings-item" id="paymentMethodsBtn">
+                    <div class="settings-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="settings-text">Способы оплаты</div>
+                    <div class="settings-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <button class="btn btn-outline" style="background-color: transparent;">Выйти из аккаунта</button>
+            </div>
+        </div>
+        
+        <!-- Панель навигации -->
+        <div class="nav-tabs">
+            <div class="nav-tab" data-screen="mapScreen">
+                <i class="fas fa-map-marked-alt"></i>
+                <div class="nav-tab-text">Карта</div>
+            </div>
+            <div class="nav-tab" data-screen="bookingsScreen">
+                <i class="fas fa-ticket-alt"></i>
+                <div class="nav-tab-text">Бронирования</div>
+            </div>
+            <div class="nav-tab active" data-screen="profileSettingsScreen">
+                <i class="fas fa-user"></i>
+                <div class="nav-tab-text">Профиль</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Экран детальной информации о парковке -->
+    <div id="parkingDetailScreen" class="screen">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-arrow-left logo-icon" id="backToMapBtn"></i>
+                <h1>Детали парковки</h1>
+            </div>
+            <i class="fas fa-info-circle header-action"></i>
+        </div>
+        
+        <div class="container">
+            <div class="parking-detail-header">
+                <h2 id="parkingName">ТЦ Галерея</h2>
+                <p id="parkingAddress">ул. Ленина, 15</p>
+                
+                <div class="parking-features">
+                    <div class="parking-feature">Крытая</div>
+                    <div class="parking-feature">Легковые</div>
+                    <div class="parking-feature">Охраняемая</div>
+                    <div class="parking-feature">24/7</div>
+                    <div class="parking-feature">Зарядка EV</div>
+                </div>
+                
+                <p><strong>Режим работы:</strong> 24/7</p>
+                <p><strong>Цена:</strong> <span id="parkingPrice">2.5</span> руб/час</p>
+            </div>
+            
+            <div class="parking-map">
+                <!-- Схема парковки -->
+                <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #f0f0f0; padding: 10px;">
+                    <div style="margin-bottom: 10px;">
+                        <i class="fas fa-car" style="font-size: 24px; color: var(--primary-color);"></i>
+                        <span style="margin-left: 10px; font-weight: bold;">Схема парковки</span>
+                    </div>
+                    <div style="width: 100%; height: 80%; background-color: #ddd; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 42px; color: #999;">
+                        P
+                    </div>
+                </div>
+            </div>
+            
+            <div class="floor-selector">
+                <div class="floor-item active" data-floor="1">1 этаж</div>
+                <div class="floor-item" data-floor="2">2 этаж</div>
+                <div class="floor-item" data-floor="3">3 этаж</div>
+                <div class="floor-item" data-floor="4">4 этаж</div>
+            </div>
+            
+            <h3>Доступные места</h3>
+            <div class="date-time-selector">
+                <div class="form-group">
+                    <label for="bookingDate">Дата</label>
+                    <input type="date" id="bookingDate" value="2025-03-19">
+                </div>
+                <div class="form-group">
+                    <label for="bookingTime">Время начала</label>
+                    <input type="time" id="bookingTime" value="14:30">
+                </div>
+            </div>
+            
+            <div class="parking-spots-container">
+                <!-- Показываем схему первого этажа по умолчанию -->
+                <div class="parking-layout floor-1 active">
+                    <div class="parking-spot spot-occupied">1</div>
+                    <div class="parking-spot spot-available">2</div>
+                    <div class="parking-spot spot-available">3</div>
+                    <div class="parking-spot spot-occupied">4</div>
+                    <div class="parking-spot spot-available">5</div>
+                    <div class="parking-spot spot-occupied">6</div>
+                    <div class="parking-spot spot-available">7</div>
+                    <div class="parking-spot spot-available">8</div>
+                    <div class="parking-spot spot-occupied">9</div>
+                    <div class="parking-spot spot-occupied">10</div>
+                    <div class="parking-spot spot-available">11</div>
+                    <div class="parking-spot spot-available">12</div>
+                    <div class="parking-spot spot-occupied">13</div>
+                    <div class="parking-spot spot-available">14</div>
+                    <div class="parking-spot spot-available">15</div>
+                    <div class="parking-spot spot-occupied">16</div>
+                    <div class="parking-spot spot-available">17</div>
+                    <div class="parking-spot spot-occupied">18</div>
+                </div>
+                
+                <!-- Схема второго этажа (скрыта по умолчанию) -->
+                <div class="parking-layout floor-2" style="display: none;">
+                    <div class="parking-spot spot-available">1</div>
+                    <div class="parking-spot spot-occupied">2</div>
+                    <div class="parking-spot spot-available">3</div>
+                    <div class="parking-spot spot-available">4</div>
+                    <div class="parking-spot spot-occupied">5</div>
+                    <div class="parking-spot spot-available">6</div>
+                    <div class="parking-spot spot-occupied">7</div>
+                    <div class="parking-spot spot-available">8</div>
+                    <div class="parking-spot spot-occupied">9</div>
+                    <div class="parking-spot spot-available">10</div>
+                    <div class="parking-spot spot-available">11</div>
+                    <div class="parking-spot spot-occupied">12</div>
+                    <div class="parking-spot spot-available">13</div>
+                    <div class="parking-spot spot-occupied">14</div>
+                    <div class="parking-spot spot-available">15</div>
+                    <div class="parking-spot spot-available">16</div>
+                    <div class="parking-spot spot-occupied">17</div>
+                    <div class="parking-spot spot-available">18</div>
+                </div>
+                
+                <!-- Схема третьего этажа (скрыта по умолчанию) -->
+                <div class="parking-layout floor-3" style="display: none;">
+                    <div class="parking-spot spot-occupied">1</div>
+                    <div class="parking-spot spot-occupied">2</div>
+                    <div class="parking-spot spot-available">3</div>
+                    <div class="parking-spot spot-available">4</div>
+                    <div class="parking-spot spot-occupied">5</div>
+                    <div class="parking-spot spot-occupied">6</div>
+                    <div class="parking-spot spot-available">7</div>
+                    <div class="parking-spot spot-available">8</div>
+                    <div class="parking-spot spot-occupied">9</div>
+                    <div class="parking-spot spot-occupied">10</div>
+                    <div class="parking-spot spot-available">11</div>
+                    <div class="parking-spot spot-available">12</div>
+                    <div class="parking-spot spot-occupied">13</div>
+                    <div class="parking-spot spot-available">14</div>
+                    <div class="parking-spot spot-occupied">15</div>
+                    <div class="parking-spot spot-available">16</div>
+                    <div class="parking-spot spot-occupied">17</div>
+                    <div class="parking-spot spot-occupied">18</div>
+                </div>
+                
+                <!-- Схема четвертого этажа (скрыта по умолчанию) -->
+                <div class="parking-layout floor-4" style="display: none;">
+                    <div class="parking-spot spot-available">1</div>
+                    <div class="parking-spot spot-available">2</div>
+                    <div class="parking-spot spot-available">3</div>
+                    <div class="parking-spot spot-occupied">4</div>
+                    <div class="parking-spot spot-available">5</div>
+                    <div class="parking-spot spot-available">6</div>
+                    <div class="parking-spot spot-occupied">7</div>
+                    <div class="parking-spot spot-available">8</div>
+                    <div class="parking-spot spot-available">9</div>
+                    <div class="parking-spot spot-occupied">10</div>
+                    <div class="parking-spot spot-available">11</div>
+                    <div class="parking-spot spot-available">12</div>
+                    <div class="parking-spot spot-occupied">13</div>
+                    <div class="parking-spot spot-available">14</div>
+                    <div class="parking-spot spot-available">15</div>
+                    <div class="parking-spot spot-occupied">16</div>
+                    <div class="parking-spot spot-available">17</div>
+                    <div class="parking-spot spot-available">18</div>
+                </div>
+            </div>
+            
+            <div class="booking-details">
+                <h3>Забронировать место</h3>
+                
+                <div class="form-group">
+                    <label for="vehicleSelect">Выберите транспортное средство</label>
+                    <select id="vehicleSelect">
+                        <option value="1234AB7">1234 AB-7</option>
+                    </select>
+                </div>
+                
+                <label>Выберите время (часы)</label>
+                <div class="time-selector">
+                    <div class="time-control" id="decreaseTime">-</div>
+                    <div class="time-value">2</div>
+                    <div class="time-control" id="increaseTime">+</div>
+                </div>
+                
+                <div class="price-info">
+                    <div>Итого:</div>
+                    <div id="totalPrice">5.00 руб</div>
+                </div>
+            </div>
+            
+            <div class="bottom-actions">
+                <button class="btn" id="payBtn">Оплатить</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Экран оплаты -->
+    <div id="paymentScreen" class="screen">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-arrow-left logo-icon" id="backToParkingBtn"></i>
+                <h1>Оплата</h1>
+            </div>
+            <i class="fas fa-question-circle header-action"></i>
+        </div>
+        
+        <div class="container">
+            <div class="payment-summary">
+                <h2>Детали бронирования</h2>
+                <p><strong>Парковка:</strong> <span id="summaryParkingName">ТЦ Галерея</span></p>
+                <p><strong>Место:</strong> <span id="summarySpotNumber">3</span> (<span id="summaryFloor">1</span> этаж)</p>
+                <p><strong>Транспортное средство:</strong> <span id="summaryVehicle">1234 AB-7</span></p>
+                <p><strong>Дата и время:</strong> <span id="summaryDateTime">19.03.2025, 14:30 - 16:30</span></p>
+                <p><strong>Сумма:</strong> <span id="summaryPrice">5.00 руб</span></p>
+            </div>
+            
+            <div class="payment-methods">
+                <h3>Выберите способ оплаты</h3>
+                
+                <div class="payment-method selected" data-method="card">
+                    <div class="payment-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="payment-name">Банковская карта</div>
+                </div>
+                
+                <div class="payment-method" data-method="mobile">
+                    <div class="payment-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="payment-name">Оплати</div>
+                </div>
+                
+                <div class="payment-method" data-method="erip">
+                    <div class="payment-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="payment-name">ЕРИП</div>
+                </div>
+                
+                <div class="payment-method" data-method="sms">
+                    <div class="payment-icon">
+                        <i class="fas fa-sms"></i>
+                    </div>
+                    <div class="payment-name">SMS-сообщение</div>
+                </div>
+                
+                <div class="save-payment">
+                    <input type="checkbox" id="savePaymentMethod">
+                    <label for="savePaymentMethod">Сохранить как предпочитаемый способ оплаты</label>
+                </div>
+            </div>
+            
+            <div class="bottom-actions">
+                <button class="btn" id="confirmPaymentBtn">Подтвердить оплату</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Экран формы оплаты картой -->
+    <div id="cardPaymentFormScreen" class="screen">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-arrow-left logo-icon" id="backToPaymentBtn"></i>
+                <h1>Оплата картой</h1>
+            </div>
+            <i class="fas fa-lock header-action"></i>
+        </div>
+        
+        <div class="container">
+            <div class="payment-form">
+                <h2>Введите данные карты</h2>
+                
+                <div class="form-group">
+                    <label for="cardNumber">Номер карты</label>
+                    <input type="text" id="cardNumber" placeholder="XXXX XXXX XXXX XXXX">
+                </div>
+                
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="expiryDate">Срок действия</label>
+                        <input type="text" id="expiryDate" placeholder="ММ/ГГ">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="cvv">CVV</label>
+                        <input type="password" id="cvv" placeholder="XXX">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cardName">Имя держателя</label>
+                    <input type="text" id="cardName" placeholder="Как указано на карте">
+                </div>
+            </div>
+            
+            <div class="bottom-actions">
+                <button class="btn" id="processCardPaymentBtn">Оплатить <span id="cardPaymentAmount">5.00 руб</span></button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Экран оплаты через мобильное приложение -->
+    <div id="mobilePaymentFormScreen" class="screen">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-arrow-left logo-icon" id="backToPaymentFromMobileBtn"></i>
+                <h1>Оплата через Оплати</h1>
+            </div>
+            <i class="fas fa-lock header-action"></i>
+        </div>
+        
+        <div class="container">
+            <div style="text-align: center; margin: 40px 0;">
+                <i class="fas fa-mobile-alt" style="font-size: 60px; color: var(--primary-color);"></i>
+                <h2 style="margin: 20px 0;">Отсканируйте QR-код</h2>
+                <p>Откройте приложение "Оплати" и отсканируйте QR-код</p>
+                
+                <div style="width: 200px; height: 200px; background-color: #f0f0f0; margin: 30px auto; position: relative; display: flex; align-items: center; justify-content: center;">
+                    <div style="width: 160px; height: 160px; background-color: white; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-qrcode" style="font-size: 100px; color: var(--primary-color);"></i>
+                    </div>
+                </div>
+                
+                <p>Сумма к оплате: <strong id="mobilePaymentAmount">5.00 руб</strong></p>
+            </div>
+            
+            <div class="bottom-actions">
+                <button class="btn" id="checkMobilePaymentBtn">Проверить оплату</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Экран оплаты через ЕРИП -->
+    <div id="eripPaymentFormScreen" class="screen">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-arrow-left logo-icon" id="backToPaymentFromEripBtn"></i>
+                <h1>Оплата через ЕРИП</h1>
+            </div>
+            <i class="fas fa-lock header-action"></i>
+        </div>
+        
+        <div class="container">
+            <div style="margin: 20px 0;">
+                <h2>Инструкции по оплате</h2>
+                <p>Для оплаты через ЕРИП выполните следующие шаги:</p>
+                
+                <ol style="margin: 20px 0; padding-left: 20px;">
+                    <li>Войдите в интернет-банкинг или мобильное приложение вашего банка</li>
+                    <li>Выберите раздел "Платежи" или "ЕРИП"</li>
+                    <li>Выберите категорию: <strong>Парковки</strong></li>
+                    <li>Выберите услугу: <strong>ParkingMTS</strong></li>
+                    <li>Введите номер заказа: <strong id="eripOrderNumber">123456789</strong></li>
+                    <li>Проверьте сумму: <strong id="eripPaymentAmount">5.00 руб</strong></li>
+                    <li>Подтвердите платеж</li>
+                </ol>
+                
+                <div style="background-color: #f0f0f0; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                    <p><strong>Код услуги:</strong> 4621</p>
+                    <p><strong>Номер заказа:</strong> <span id="eripOrderNumber2">123456789</span></p>
+                    <p><strong>Сумма к оплате:</strong> <span id="eripPaymentAmount2">5.00 руб</span></p>
+                </div>
+            </div>
+            
+            <div class="bottom-actions">
+                <button class="btn" id="checkEripPaymentBtn">Я оплатил</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Экран оплаты через SMS -->
+    <div id="smsPaymentFormScreen" class="screen">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-arrow-left logo-icon" id="backToPaymentFromSmsBtn"></i>
+                <h1>Оплата через SMS</h1>
+            </div>
+            <i class="fas fa-lock header-action"></i>
+        </div>
+        
+        <div class="container">
+            <div style="text-align: center; margin: 40px 0;">
+                <i class="fas fa-sms" style="font-size: 60px; color: var(--primary-color);"></i>
+                <h2 style="margin: 20px 0;">Отправьте SMS для оплаты</h2>
+                
+                <div style="background-color: #f0f0f0; padding: 20px; border-radius: 8px; margin: 30px 0; text-align: left;">
+                    <p><strong>Отправьте SMS с текстом:</strong></p>
+                    <div style="background-color: white; padding: 15px; border-radius: 8px; margin: 10px 0; font-family: monospace; font-size: 18px;">
+                        PARK 123456 5.00
+                    </div>
+                    <p>на номер <strong>7788</strong></p>
+                    <p style="font-size: 14px; color: var(--dark-gray); margin-top: 15px;">Стоимость SMS согласно тарифам вашего оператора. С баланса вашего телефона будет списано <strong id="smsPaymentAmount">5.00 руб</strong></p>
+                </div>
+            </div>
+            
+            <div class="bottom-actions">
+                <button class="btn" id="checkSmsPaymentBtn">Я отправил SMS</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Экран успешной оплаты -->
+    <div id="successScreen" class="screen">
+        <div class="success-screen">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h2>Оплата успешно выполнена!</h2>
+            <p>Ваше место <span id="successSpotNumber">3</span> на парковке "<span id="successParkingName">ТЦ Галерея</span>" забронировано на <span id="successHours">2</span> часа.</p>
+            <p>Дата и время: <span id="successDateTime">19.03.2025, 14:30 - 16:30</span></p>
+            <p>Код доступа: <span id="successAccessCode">1234</span></p>
+            <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                <button class="btn" id="viewBookingBtn">Просмотреть бронирование</button>
+                <button class="btn btn-outline" id="backToMainBtn">Вернуться на главную</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Уведомление -->
+    <div class="notification" id="notification">
+        <div class="notification-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="notification-content">
+            <div class="notification-title">Успешно</div>
+            <div class="notification-message">Действие выполнено успешно</div>
+        </div>
+        <div class="notification-close">
+            <i class="fas fa-times"></i>
+        </div>
+    </div>
+    
+    <!-- Фоновая подложка для модальных окон -->
+    <div class="backdrop" id="backdrop"></div>
+    
+    <!-- Модальное окно подтверждения -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-header">
+            <div class="modal-title">Подтверждение</div>
+            <div class="modal-close" id="closeConfirmModal"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="modal-body">
+            <p>Вы уверены, что хотите выполнить это действие?</p>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline btn-small" id="cancelConfirmAction">Отмена</button>
+            <button class="btn btn-small" id="confirmAction">Подтвердить</button>
+        </div>
+    </div>
+    
+    <!-- Индикатор загрузки -->
+    <div class="loading" id="loadingIndicator">
+        <div class="spinner"></div>
+        <p style="margin-top: 20px;">Пожалуйста, подождите...</p>
+    </div>
+
+    <script>
+        // Переменные для работы с картой
+        let isDragging = false;
+        let startPosX, startPosY;
+        let currentTranslateX = -300;
+        let currentTranslateY = -300;
+        let parkingMap = {};
+        let currentPaymentMethod = 'card';
+        let selectedParkingId = null;
+        let selectedSpot = null;
+        let selectedFloor = "1";
+        let timeValue = 2;
+        const hourlyRate = 2.5;
+        let currentFilters = [];
+        
+        // Функция для инициализации приложения
+        function initApp() {
+            // Инициализация обработчиков событий
+            initEventHandlers();
+            
+            // Инициализация карты
+            initMap();
+            
+            // Инициализация данных парковок
+            initParkingData();
+            
+            // Инициализация мест парковки
+            initParkingSpots();
+            
+            // Инициализация фильтров
+            initFilters();
+            
+            // Анимация элементов при загрузке
+            animateElementsOnLoad();
+        }
+        
+        // Функция для инициализации данных о парковках
+        function initParkingData() {
+            // Создаем объект с данными о парковках
+            parkingMap = {
+                "1": {
+                    name: "ТЦ Галерея",
+                    address: "ул. Ленина, 15",
+                    price: 2.5,
+                    filters: ["covered", "car", "security", "24h", "ev"],
+                    floors: 4,
+                    totalSpots: 60,
+                    availableSpots: 45
+                },
+                "2": {
+                    name: "Центральная площадь",
+                    address: "пл. Свободы, 2",
+                    price: 2.0,
+                    filters: ["covered", "car", "24h", "disabled"],
+                    floors: 1,
+                    totalSpots: 40,
+                    availableSpots: 12
+                },
+                "3": {
+                    name: "Бизнес-центр \"Москва\"",
+                    address: "пр. Независимости, 58",
+                    price: 3.0,
+                    filters: ["uncovered", "car", "truck", "security"],
+                    floors: 1,
+                    totalSpots: 80,
+                    availableSpots: 0
+                },
+                "4": {
+                    name: "ТРЦ \"Европа\"",
+                    address: "ул. Сурганова, 57А",
+                    price: 2.8,
+                    filters: ["covered", "car", "security", "ev", "disabled"],
+                    floors: 3,
+                    totalSpots: 50,
+                    availableSpots: 35
+                },
+                "5": {
+                    name: "Городской парк",
+                    address: "ул. Парковая, 10",
+                    price: 0,
+                    filters: ["uncovered", "car", "long", "free"],
+                    floors: 1,
+                    totalSpots: 45,
+                    availableSpots: 18
+                },
+                "6": {
+                    name: "Отель \"Президент\"",
+                    address: "ул. Кирова, 28",
+                    price: 3.5,
+                    filters: ["covered", "car", "security", "24h", "ev", "disabled"],
+                    floors: 2,
+                    totalSpots: 30,
+                    availableSpots: 25
+                },
+                "7": {
+                    name: "Грузовой терминал",
+                    address: "ул. Промышленная, 8",
+                    price: 4.0,
+                    filters: ["uncovered", "truck", "long"],
+                    floors: 1,
+                    totalSpots: 25,
+                    availableSpots: 0
+                },
+                "8": {
+                    name: "Жилой комплекс \"Маяк\"",
+                    address: "пр. Победителей, 127",
+                    price: 2.0,
+                    filters: ["covered", "car", "24h", "security"],
+                    floors: 2,
+                    totalSpots: 40,
+                    availableSpots: 30
+                },
+                "9": {
+                    name: "Городская библиотека",
+                    address: "ул. Пушкина, 14",
+                    price: 0,
+                    filters: ["uncovered", "car", "free"],
+                    floors: 1,
+                    totalSpots: 20,
+                    availableSpots: 15
+                },
+                "10": {
+                    name: "Торговый центр \"Столица\"",
+                    address: "пр. Независимости, 113",
+                    price: 3.0,
+                    filters: ["covered", "car", "ev", "24h"],
+                    floors: 4,
+                    totalSpots: 70,
+                    availableSpots: 22
+                }
+            };
+        }
+        
+        // Функция для инициализации обработчиков событий
+        function initEventHandlers() {
+            // Обработчики для экрана входа
+            document.getElementById('loginBtn').addEventListener('click', function() {
+                showLoading();
+                // Имитация загрузки
+                setTimeout(function() {
+                    hideLoading();
+                    showScreen('profileScreen');
+                }, 1000);
+            });
+            
+            document.getElementById('registerBtn').addEventListener('click', function() {
+                showLoading();
+                // Имитация загрузки
+                setTimeout(function() {
+                    hideLoading();
+                    showScreen('profileScreen');
+                }, 1000);
+            });
+            
+            // Обработчики для экрана профиля
+            document.getElementById('saveProfileBtn').addEventListener('click', function() {
+                showLoading();
+                // Имитация загрузки
+                setTimeout(function() {
+                    hideLoading();
+                    showScreen('mapScreen');
+                    showNotification('success', 'Профиль сохранен', 'Ваш профиль успешно сохранен');
+                }, 1000);
+            });
+            
+            // Обработчики для настроек профиля
+            document.getElementById('profileBtn').addEventListener('click', function() {
+                showScreen('profileSettingsScreen');
+            });
+            
+            document.getElementById('openSettingsBtn').addEventListener('click', function() {
+                showScreen('settingsScreen');
+            });
+            
+            document.getElementById('backFromSettingsBtn').addEventListener('click', function() {
+                showScreen('profileSettingsScreen');
+            });
+            
+            document.getElementById('saveSettingsBtn').addEventListener('click', function() {
+                showLoading();
+                setTimeout(function() {
+                    hideLoading();
+                    showScreen('profileSettingsScreen');
+                    showNotification('success', 'Настройки сохранены', 'Изменения успешно сохранены');
+                }, 800);
+            });
+            
+            // Обработчики для экрана карты
+            document.querySelectorAll('.parking-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    selectedParkingId = this.getAttribute('data-id');
+                    showParkingDetails(selectedParkingId);
+                });
+            });
+            
+            document.querySelectorAll('.parking-marker').forEach(function(marker) {
+                marker.addEventListener('click', function() {
+                    selectedParkingId = this.getAttribute('data-id');
+                    showParkingDetails(selectedParkingId);
+                });
+            });
+            
+            // Обработчики для навигационных табов
+            document.querySelectorAll('.nav-tab').forEach(function(tab) {
+                tab.addEventListener('click', function() {
+                    const screenId = this.getAttribute('data-screen');
+                    showScreen(screenId);
+                    
+                    // Обновляем активный таб
+                    document.querySelectorAll('.nav-tab').forEach(function(t) {
+                        t.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+            
+            // Обработчики для детальной информации о парковке
+            document.getElementById('backToMapBtn').addEventListener('click', function() {
+                showScreen('mapScreen');
+            });
+            
+            document.getElementById('payBtn').addEventListener('click', function() {
+                if (selectedSpot) {
+                    updatePaymentSummary();
+                    showScreen('paymentScreen');
+                } else {
+                    showNotification('error', 'Выберите место', 'Пожалуйста, выберите парковочное место');
+                }
+            });
+            
+            // Обработчики для выбора этажа
+            document.querySelectorAll('.floor-item').forEach(function(floorItem) {
+                floorItem.addEventListener('click', function() {
+                    const floor = this.getAttribute('data-floor');
+                    selectedFloor = floor;
+                    
+                    // Обновляем активный этаж
+                    document.querySelectorAll('.floor-item').forEach(function(item) {
+                        item.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Показываем схему нужного этажа
+                    document.querySelectorAll('.parking-layout').forEach(function(layout) {
+                        layout.style.display = 'none';
+                    });
+                    document.querySelector(`.floor-${floor}`).style.display = 'grid';
+                });
+            });
+            
+            // Обработчики для экрана оплаты
+            document.getElementById('backToParkingBtn').addEventListener('click', function() {
+                showScreen('parkingDetailScreen');
+            });
+            
+            document.querySelectorAll('.payment-method').forEach(function(method) {
+                method.addEventListener('click', function() {
+                    // Снять выделение с других методов
+                    document.querySelectorAll('.payment-method.selected').forEach(function(selected) {
+                        selected.classList.remove('selected');
+                    });
+                    
+                    // Выделить текущий метод
+                    this.classList.add('selected');
+                    
+                    // Запомнить выбранный метод
+                    currentPaymentMethod = this.getAttribute('data-method');
+                });
+            });
+            
+            document.getElementById('confirmPaymentBtn').addEventListener('click', function() {
+                switch (currentPaymentMethod) {
+                    case 'card':
+                        showScreen('cardPaymentFormScreen');
+                        break;
+                    case 'mobile':
+                        showScreen('mobilePaymentFormScreen');
+                        break;
+                    case 'erip':
+                        showScreen('eripPaymentFormScreen');
+                        break;
+                    case 'sms':
+                        showScreen('smsPaymentFormScreen');
+                        break;
+                    default:
+                        showScreen('cardPaymentFormScreen');
+                }
+            });
+            
+            // Обработчики для экранов форм оплаты
+            document.getElementById('backToPaymentBtn').addEventListener('click', function() {
+                showScreen('paymentScreen');
+            });
+            
+            document.getElementById('backToPaymentFromMobileBtn').addEventListener('click', function() {
+                showScreen('paymentScreen');
+            });
+            
+            document.getElementById('backToPaymentFromEripBtn').addEventListener('click', function() {
+                showScreen('paymentScreen');
+            });
+            
+            document.getElementById('backToPaymentFromSmsBtn').addEventListener('click', function() {
+                showScreen('paymentScreen');
+            });
+            
+            document.getElementById('processCardPaymentBtn').addEventListener('click', function() {
+                processPayment();
+            });
+            
+            document.getElementById('checkMobilePaymentBtn').addEventListener('click', function() {
+                processPayment();
+            });
+            
+            document.getElementById('checkEripPaymentBtn').addEventListener('click', function() {
+                processPayment();
+            });
+            
+            document.getElementById('checkSmsPaymentBtn').addEventListener('click', function() {
+                processPayment();
+            });
+            
+            // Обработчики для экрана успешной оплаты
+            document.getElementById('viewBookingBtn').addEventListener('click', function() {
+                showScreen('bookingsScreen');
+            });
+            
+            document.getElementById('backToMainBtn').addEventListener('click', function() {
+                showScreen('mapScreen');
+            });
+            
+            // Обработчик для добавления ТС
+            document.querySelectorAll('.add-vehicle').forEach(function(element) {
+                element.addEventListener('click', function() {
+                    const vehicleList = this.closest('.vehicle-list');
+                    const newVehicleItem = document.createElement('div');
+                    newVehicleItem.className = 'vehicle-item';
+                    newVehicleItem.innerHTML = `
+                        <div class="form-group">
+                            <label for="vehicleNumber${Date.now()}">Регистрационный номер</label>
+                            <input type="text" id="vehicleNumber${Date.now()}" placeholder="Например, 1234 AB-7">
+                        </div>
+                    `;
+                    
+                    // Вставить новый элемент перед кнопкой "Добавить еще ТС"
+                    vehicleList.insertBefore(newVehicleItem, this);
+                    
+                    // Анимация нового элемента
+                    newVehicleItem.classList.add('animated', 'fadeIn');
+                });
+            });
+            
+            // Обработчики для кнопок увеличения/уменьшения времени
+            document.getElementById('decreaseTime').addEventListener('click', function() {
+                if (timeValue > 1) {
+                    timeValue--;
+                    document.querySelector('.time-value').textContent = timeValue;
+                    updatePrice();
+                }
+            });
+            
+            document.getElementById('increaseTime').addEventListener('click', function() {
+                timeValue++;
+                document.querySelector('.time-value').textContent = timeValue;
+                updatePrice();
+            });
+            
+            // Обработчик для закрытия уведомления
+            document.querySelector('.notification-close').addEventListener('click', function() {
+                hideNotification();
+            });
+            
+            // Обработчики для карты
+            const cityMap = document.getElementById('cityMap');
+            
+            cityMap.addEventListener('mousedown', function(e) {
+                startDragging(e.clientX, e.clientY);
+            });
+            
+            cityMap.addEventListener('touchstart', function(e) {
+                const touch = e.touches[0];
+                startDragging(touch.clientX, touch.clientY);
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (isDragging) {
+                    drag(e.clientX, e.clientY);
+                }
+            });
+            
+            document.addEventListener('touchmove', function(e) {
+                if (isDragging) {
+                    const touch = e.touches[0];
+                    drag(touch.clientX, touch.clientY);
+                    e.preventDefault();
+                }
+            });
+            
+            document.addEventListener('mouseup', function() {
+                stopDragging();
+            });
+            
+            document.addEventListener('touchend', function() {
+                stopDragging();
+            });
+            
+            // Обработчики для кнопок управления картой
+            document.getElementById('zoomInBtn').addEventListener('click', function() {
+                zoomIn();
+            });
+            
+            document.getElementById('zoomOutBtn').addEventListener('click', function() {
+                zoomOut();
+            });
+            
+            document.getElementById('centerMapBtn').addEventListener('click', function() {
+                centerMap();
+            });
+        }
+        
+        // Функция для инициализации карты
+        function initMap() {
+            const cityMap = document.getElementById('cityMap');
+            cityMap.style.transform = `translate(${currentTranslateX}px, ${currentTranslateY}px)`;
+        }
+        
+        // Функция для инициализации мест парковки
+        function initParkingSpots() {
+            document.querySelectorAll('.parking-spot.spot-available').forEach(function(spot) {
+                spot.addEventListener('click', function() {
+                    // Снять выделение с других мест
+                    document.querySelectorAll('.parking-spot.spot-selected').forEach(function(selected) {
+                        selected.classList.remove('spot-selected');
+                        selected.classList.add('spot-available');
+                    });
+                    
+                    // Выделить текущее место
+                    this.classList.remove('spot-available');
+                    this.classList.add('spot-selected');
+                    
+                    // Запомнить выбранное место
+                    selectedSpot = this.textContent;
+                    
+                    // Обновить цену
+                    updatePrice();
+                });
+            });
+        }
+        
+        // Функция для инициализации фильтров
+        function initFilters() {
+            document.querySelectorAll('.filter-chip').forEach(function(chip) {
+                chip.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    
+                    // Обновить текущие фильтры
+                    const filter = this.getAttribute('data-filter');
+                    if (this.classList.contains('active')) {
+                        if (!currentFilters.includes(filter)) {
+                            currentFilters.push(filter);
+                        }
+                    } else {
+                        const index = currentFilters.indexOf(filter);
+                        if (index !== -1) {
+                            currentFilters.splice(index, 1);
+                        }
+                    }
+                    
+                    // Применить фильтры к списку парковок
+                    applyFilters();
+                });
+            });
+        }
+        
+        // Функция для применения фильтров
+        function applyFilters() {
+            if (currentFilters.length === 0) {
+                // Если фильтры не выбраны, показать все парковки
+                document.querySelectorAll('.parking-item').forEach(function(item) {
+                    item.style.display = 'flex';
+                });
+                
+                document.querySelectorAll('.parking-marker').forEach(function(marker) {
+                    marker.style.display = 'flex';
+                });
+                
+                return;
+            }
+            
+            // Применить фильтры к списку парковок
+            document.querySelectorAll('.parking-item').forEach(function(item) {
+                const itemFilters = item.getAttribute('data-filters').split(',');
+                let shouldShow = false;
+                
+                // Проверяем, содержит ли парковка все выбранные фильтры
+                for (const filter of currentFilters) {
+                    if (itemFilters.includes(filter)) {
+                        shouldShow = true;
+                        break;
+                    }
+                }
+                
+                item.style.display = shouldShow ? 'flex' : 'none';
+            });
+            
+            // Применить те же фильтры к маркерам на карте
+            document.querySelectorAll('.parking-marker').forEach(function(marker) {
+                const id = marker.getAttribute('data-id');
+                const parking = parkingMap[id];
+                let shouldShow = false;
+                
+                if (parking) {
+                    for (const filter of currentFilters) {
+                        if (parking.filters.includes(filter)) {
+                            shouldShow = true;
+                            break;
+                        }
+                    }
+                }
+                
+                marker.style.display = shouldShow ? 'flex' : 'none';
+            });
+        }
+        
+        // Функция для отображения деталей парковки
+        function showParkingDetails(id) {
+            const parking = parkingMap[id];
+            if (!parking) return;
+            
+            // Обновляем информацию о парковке
+            document.getElementById('parkingName').textContent = parking.name;
+            document.getElementById('parkingAddress').textContent = parking.address;
+            document.getElementById('parkingPrice').textContent = parking.price;
+            
+            // Сбрасываем выбранное место
+            selectedSpot = null;
+            document.querySelectorAll('.parking-spot.spot-selected').forEach(function(selected) {
+                selected.classList.remove('spot-selected');
+                selected.classList.add('spot-available');
+            });
+            
+            // Обновляем цену
+            updatePrice();
+            
+            // Показываем экран с деталями
+            showScreen('parkingDetailScreen');
+            
+            // Обновляем список этажей если парковка многоуровневая
+            const floorSelector = document.querySelector('.floor-selector');
+            floorSelector.innerHTML = '';
+            
+            for (let i = 1; i <= parking.floors; i++) {
+                const floorItem = document.createElement('div');
+                floorItem.className = i === 1 ? 'floor-item active' : 'floor-item';
+                floorItem.setAttribute('data-floor', i);
+                floorItem.textContent = i + ' этаж';
+                
+                floorItem.addEventListener('click', function() {
+                    const floor = this.getAttribute('data-floor');
+                    selectedFloor = floor;
+                    
+                    document.querySelectorAll('.floor-item').forEach(function(item) {
+                        item.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    document.querySelectorAll('.parking-layout').forEach(function(layout) {
+                        layout.style.display = 'none';
+                    });
+                    
+                    // Показываем или создаем схему выбранного этажа
+                    let floorLayout = document.querySelector(`.floor-${floor}`);
+                    if (floorLayout) {
+                        floorLayout.style.display = 'grid';
+                    } else {
+                        // Сгенерировать новую схему этажа, если не существует
+                        generateFloorLayout(floor);
+                    }
+                });
+                
+                floorSelector.appendChild(floorItem);
+            }
+            
+            // Показываем или скрываем селектор этажей в зависимости от количества этажей
+            floorSelector.style.display = parking.floors > 1 ? 'flex' : 'none';
+            
+            // Сбрасываем выбранный этаж
+            selectedFloor = "1";
+            
+            // Показываем первый этаж по умолчанию
+            document.querySelectorAll('.parking-layout').forEach(function(layout) {
+                layout.style.display = 'none';
+            });
+            document.querySelector('.floor-1').style.display = 'grid';
+            
+            // Обновляем информацию о доступности мест
+            updateAvailableSpots(parking);
+            
+            // Анимируем появление деталей
+            animateDetailsScreen();
+        }
+        
+        // Функция для генерации разметки этажа парковки
+        function generateFloorLayout(floor) {
+            const parkingSpotsContainer = document.querySelector('.parking-spots-container');
+            const newLayout = document.createElement('div');
+            newLayout.className = `parking-layout floor-${floor}`;
+            newLayout.style.display = 'grid';
+            
+            // Генерируем случайные места для этажа
+            const totalSpots = Math.floor(Math.random() * 10) + 15; // От 15 до 24 мест
+            
+            for (let i = 1; i <= totalSpots; i++) {
+                const spot = document.createElement('div');
+                
+                // Случайно определяем, доступно ли место
+                const isAvailable = Math.random() > 0.3; // 70% мест доступны
+                
+                spot.className = `parking-spot ${isAvailable ? 'spot-available' : 'spot-occupied'}`;
+                spot.textContent = i;
+                
+                if (isAvailable) {
+                    spot.addEventListener('click', function() {
+                        document.querySelectorAll('.parking-spot.spot-selected').forEach(function(selected) {
+                            selected.classList.remove('spot-selected');
+                            selected.classList.add('spot-available');
+                        });
+                        
+                        this.classList.remove('spot-available');
+                        this.classList.add('spot-selected');
+                        
+                        selectedSpot = this.textContent;
+                        updatePrice();
+                    });
+                }
+                
+                newLayout.appendChild(spot);
+            }
+            
+            parkingSpotsContainer.appendChild(newLayout);
+        }
+        
+        // Функция для обновления информации о доступных местах
+        function updateAvailableSpots(parking) {
+            // Обновляем свободные/занятые места на схеме в соответствии с данными парковки
+            const availablePercent = (parking.availableSpots / parking.totalSpots) * 100;
+            
+            document.querySelectorAll('.parking-spot').forEach(function(spot, index) {
+                if (index < parking.totalSpots) {
+                    // Определяем, должно ли место быть свободным или занятым на основе процента свободных мест
+                    const shouldBeAvailable = (index / parking.totalSpots) * 100 > (100 - availablePercent);
+                    
+                    if (shouldBeAvailable) {
+                        if (!spot.classList.contains('spot-selected')) {
+                            spot.classList.remove('spot-occupied');
+                            spot.classList.add('spot-available');
+                        }
+                    } else {
+                        spot.classList.remove('spot-available', 'spot-selected');
+                        spot.classList.add('spot-occupied');
+                    }
+                }
+            });
+        }
+        
+        // Функция для обновления цены
+        function updatePrice() {
+            const totalPrice = (timeValue * parseFloat(document.getElementById('parkingPrice').textContent)).toFixed(2);
+            document.getElementById('totalPrice').textContent = totalPrice + ' руб';
+        }
+        
+        // Функция для обновления сводки по оплате
+        function updatePaymentSummary() {
+            const parkingName = document.getElementById('parkingName').textContent;
+            const spotNumber = selectedSpot;
+            const vehicle = document.getElementById('vehicleSelect').value === '1234AB7' ? '1234 AB-7' : '5678 CD-9';
+            const floor = selectedFloor;
+            const totalPrice = document.getElementById('totalPrice').textContent;
+            const dateTime = formatDateTime();
+            
+            // Обновляем информацию в сводке
+            document.getElementById('summaryParkingName').textContent = parkingName;
+            document.getElementById('summarySpotNumber').textContent = spotNumber;
+            document.getElementById('summaryFloor').textContent = floor;
+            document.getElementById('summaryVehicle').textContent = vehicle;
+            document.getElementById('summaryDateTime').textContent = dateTime;
+            document.getElementById('summaryPrice').textContent = totalPrice;
+            
+            // Обновляем суммы на экранах оплаты
+            document.getElementById('cardPaymentAmount').textContent = totalPrice;
+            document.getElementById('mobilePaymentAmount').textContent = totalPrice;
+            document.getElementById('eripPaymentAmount').textContent = totalPrice;
+            document.getElementById('eripPaymentAmount2').textContent = totalPrice;
+            document.getElementById('smsPaymentAmount').textContent = totalPrice;
+            
+            // Генерируем случайный код заказа для ЕРИП
+            const orderNumber = Math.floor(Math.random() * 900000000) + 100000000;
+            document.getElementById('eripOrderNumber').textContent = orderNumber;
+            document.getElementById('eripOrderNumber2').textContent = orderNumber;
+        }
+        
+        // Функция для форматирования даты и времени
+        function formatDateTime() {
+            const bookingDate = document.getElementById('bookingDate').value;
+            const bookingTime = document.getElementById('bookingTime').value;
+            
+            const date = new Date(bookingDate + 'T' + bookingTime);
+            const endDate = new Date(date.getTime() + timeValue * 60 * 60 * 1000);
+            
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            
+            const startHours = date.getHours().toString().padStart(2, '0');
+            const startMinutes = date.getMinutes().toString().padStart(2, '0');
+            
+            const endHours = endDate.getHours().toString().padStart(2, '0');
+            const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
+            
+            return `${day}.${month}.${year}, ${startHours}:${startMinutes} - ${endHours}:${endMinutes}`;
+        }
+        
+        // Функция для обработки оплаты
+        function processPayment() {
+            showLoading();
+            
+            // Имитация процесса оплаты
+            setTimeout(function() {
+                hideLoading();
+                
+                // Обновляем информацию на экране успешной оплаты
+                document.getElementById('successParkingName').textContent = document.getElementById('summaryParkingName').textContent;
+                document.getElementById('successSpotNumber').textContent = document.getElementById('summarySpotNumber').textContent;
+                document.getElementById('successHours').textContent = timeValue;
+                document.getElementById('successDateTime').textContent = document.getElementById('summaryDateTime').textContent;
+                document.getElementById('successAccessCode').textContent = Math.floor(1000 + Math.random() * 9000);
+                
+                showScreen('successScreen');
+                
+                // Добавляем новое бронирование в список
+                addNewBooking();
+            }, 2000);
+        }
+        
+        // Функция для добавления нового бронирования в список
+        function addNewBooking() {
+            const bookingsContainer = document.querySelector('#bookingsScreen .container');
+            const newBooking = document.createElement('div');
+            newBooking.className = 'booking-card animated fadeIn';
+            
+            const parkingName = document.getElementById('summaryParkingName').textContent;
+            const spotNumber = document.getElementById('summarySpotNumber').textContent;
+            const floor = document.getElementById('summaryFloor').textContent;
+            const vehicle = document.getElementById('summaryVehicle').textContent;
+            const dateTime = document.getElementById('summaryDateTime').textContent;
+            const accessCode = document.getElementById('successAccessCode').textContent;
+            
+            newBooking.innerHTML = `
+                <div class="booking-status status-active">Активно</div>
+                <div class="booking-info-row">
+                    <div class="booking-info-label">Парковка:</div>
+                    <div class="booking-info-value">${parkingName}</div>
+                </div>
+                <div class="booking-info-row">
+                    <div class="booking-info-label">Место:</div>
+                    <div class="booking-info-value">${spotNumber} (${floor} этаж)</div>
+                </div>
+                <div class="booking-info-row">
+                    <div class="booking-info-label">Автомобиль:</div>
+                    <div class="booking-info-value">${vehicle}</div>
+                </div>
+                <div class="booking-info-row">
+                    <div class="booking-info-label">Дата и время:</div>
+                    <div class="booking-info-value">${dateTime}</div>
+                </div>
+                <div class="booking-info-row">
+                    <div class="booking-info-label">Код доступа:</div>
+                    <div class="booking-info-value">${accessCode}</div>
+                </div>
+                <div class="booking-actions">
+                    <button class="btn btn-small" style="flex: 1;">Продлить</button>
+                    <button class="btn btn-small btn-outline" style="flex: 1;">Отменить</button>
+                </div>
+            `;
+            
+            // Вставляем новое бронирование в начало списка
+            bookingsContainer.insertBefore(newBooking, bookingsContainer.firstChild);
+        }
+        
+        // Функции для работы с картой
+        function startDragging(clientX, clientY) {
+            isDragging = true;
+            startPosX = clientX;
+            startPosY = clientY;
+        }
+        
+        function drag(clientX, clientY) {
+            if (!isDragging) return;
+            
+            const diffX = clientX - startPosX;
+            const diffY = clientY - startPosY;
+            
+            currentTranslateX += diffX;
+            currentTranslateY += diffY;
+            
+            // Ограничим перемещение карты
+            currentTranslateX = Math.min(200, Math.max(-800, currentTranslateX));
+            currentTranslateY = Math.min(200, Math.max(-800, currentTranslateY));
+            
+            document.getElementById('cityMap').style.transform = `translate(${currentTranslateX}px, ${currentTranslateY}px)`;
+            
+            startPosX = clientX;
+            startPosY = clientY;
+        }
+        
+        function stopDragging() {
+            isDragging = false;
+        }
+        
+        function zoomIn() {
+            const cityMap = document.getElementById('cityMap');
+            const currentScale = parseFloat(cityMap.style.transform.match(/scale\(([^)]+)\)/) ? 
+                                            cityMap.style.transform.match(/scale\(([^)]+)\)/)[1] : 1);
+            
+            if (currentScale < 1.5) {
+                const newScale = currentScale + 0.1;
+                cityMap.style.transform = `translate(${currentTranslateX}px, ${currentTranslateY}px) scale(${newScale})`;
+            }
+        }
+        
+        function zoomOut() {
+            const cityMap = document.getElementById('cityMap');
+            const currentScale = parseFloat(cityMap.style.transform.match(/scale\(([^)]+)\)/) ? 
+                                            cityMap.style.transform.match(/scale\(([^)]+)\)/)[1] : 1);
+            
+            if (currentScale > 0.5) {
+                const newScale = currentScale - 0.1;
+                cityMap.style.transform = `translate(${currentTranslateX}px, ${currentTranslateY}px) scale(${newScale})`;
+            }
+        }
+        
+        function centerMap() {
+            currentTranslateX = -300;
+            currentTranslateY = -300;
+            
+            const cityMap = document.getElementById('cityMap');
+            const currentScale = parseFloat(cityMap.style.transform.match(/scale\(([^)]+)\)/) ? 
+                                            cityMap.style.transform.match(/scale\(([^)]+)\)/)[1] : 1);
+            
+            cityMap.style.transform = `translate(${currentTranslateX}px, ${currentTranslateY}px) scale(${currentScale})`;
+        }
+        
+        // Функция для показа загрузки
+        function showLoading() {
+            document.getElementById('loadingIndicator').classList.add('active');
+        }
+        
+        // Функция для скрытия загрузки
+        function hideLoading() {
+            document.getElementById('loadingIndicator').classList.remove('active');
+        }
+        
+        // Функция для переключения экранов
+        function showScreen(screenId) {
+            // Скрыть все экраны
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Показать нужный экран
+            document.getElementById(screenId).classList.add('active');
+            
+            // Применяем анимацию при переключении экранов
+            document.getElementById(screenId).classList.add('animated', 'fadeIn');
+            
+            // Убираем класс анимации после завершения
+            setTimeout(function() {
+                document.getElementById(screenId).classList.remove('animated', 'fadeIn');
+            }, 500);
+            
+            // Обновляем активный таб, если есть навигационные табы
+            if (screenId === 'mapScreen' || screenId === 'bookingsScreen' || screenId === 'profileSettingsScreen') {
+                document.querySelectorAll('.nav-tab').forEach(function(tab) {
+                    if (tab.getAttribute('data-screen') === screenId) {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+            }
+        }
+        
+        // Функция для показа уведомления
+        function showNotification(type, title, message) {
+            const notification = document.getElementById('notification');
+            const notificationIcon = notification.querySelector('.notification-icon i');
+            const notificationTitle = notification.querySelector('.notification-title');
+            const notificationMessage = notification.querySelector('.notification-message');
+            
+            // Удалить все классы типа уведомления
+            notification.classList.remove('notification-success', 'notification-error', 'notification-info');
+            
+            // Добавить класс типа уведомления
+            notification.classList.add(`notification-${type}`);
+            
+            // Обновить иконку в зависимости от типа
+            switch (type) {
+                case 'success':
+                    notificationIcon.className = 'fas fa-check-circle';
+                    break;
+                case 'error':
+                    notificationIcon.className = 'fas fa-exclamation-circle';
+                    break;
+                case 'info':
+                    notificationIcon.className = 'fas fa-info-circle';
+                    break;
+                default:
+                    notificationIcon.className = 'fas fa-bell';
+            }
+            
+            // Обновить текст
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            // Показать уведомление
+            notification.classList.add('show');
+            
+            // Автоматически скрыть через 3 секунды
+            setTimeout(hideNotification, 3000);
+        }
+        
+        // Функция для скрытия уведомления
+        function hideNotification() {
+            const notification = document.getElementById('notification');
+            notification.classList.remove('show');
+        }
+        
+        // Функция для анимации элементов при загрузке
+        function animateElementsOnLoad() {
+            // Анимируем списки парковок
+            document.querySelectorAll('.parking-item').forEach(function(item, index) {
+                setTimeout(function() {
+                    item.classList.add('animated', 'slideUp');
+                    setTimeout(function() {
+                        item.classList.remove('animated', 'slideUp');
+                    }, 500);
+                }, index * 100);
+            });
+            
+            // Анимируем фильтры
+            document.querySelectorAll('.filter-chip').forEach(function(chip, index) {
+                setTimeout(function() {
+                    chip.classList.add('animated', 'fadeIn');
+                    setTimeout(function() {
+                        chip.classList.remove('animated', 'fadeIn');
+                    }, 500);
+                }, index * 50);
+            });
+            
+            // Анимируем маркеры на карте
+            document.querySelectorAll('.parking-marker').forEach(function(marker, index) {
+                setTimeout(function() {
+                    marker.classList.add('animated', 'fadeIn');
+                    setTimeout(function() {
+                        marker.classList.remove('animated', 'fadeIn');
+                    }, 500);
+                }, index * 100);
+            });
+        }
+        
+        // Функция для анимации экрана деталей
+        function animateDetailsScreen() {
+            document.querySelectorAll('#parkingDetailScreen .parking-spot').forEach(function(spot, index) {
+                setTimeout(function() {
+                    spot.classList.add('animated', 'fadeIn');
+                    setTimeout(function() {
+                        spot.classList.remove('animated', 'fadeIn');
+                    }, 500);
+                }, index * 20);
+            });
+        }
+        
+        // Инициализация приложения при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+        });
+    </script>
+</body>
+</html>
